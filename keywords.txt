@@ -1,0 +1,53 @@
+#######################################
+# Data types (KEYWORD1)
+#######################################
+
+TuyaWifi	KEYWORD1
+TuyaUart	KEYWORD1
+TuyaTools	KEYWORD1
+TuyaDataPoint	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+my_device KEYWORD2
+init	KEYWORD2
+uart_service	KEYWORD2
+dp_process_func_register	KEYWORD2
+dp_update_all_func_register	KEYWORD2
+data_point_handle	KEYWORD2
+set_download_cmd_total	KEYWORD2
+get_dowmload_dpid_index	KEYWORD2
+mcu_get_dp_download_data	KEYWORD2
+mcu_dp_update	KEYWORD2
+mcu_set_wifi_mode	KEYWORD2
+mcu_get_wifi_work_state	KEYWORD2
+set_dp_cmd_total	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+SMART_CONFIG_STATE	LITERAL1
+AP_STATE	LITERAL1
+WIFI_NOT_CONNECTED	LITERAL1
+WIFI_CONNECTED	LITERAL1
+WIFI_CONN_CLOUD	LITERAL1
+WIFI_LOW_POWER	LITERAL1
+SMART_AND_AP_STATE	LITERAL1
+WIFI_SATE_UNKNOW	LITERAL1
+
+DP_TYPE_RAW	LITERAL1
+DP_TYPE_BOOL	LITERAL1
+DP_TYPE_VALUE	LITERAL1
+DP_TYPE_STRING	LITERAL1
+DP_TYPE_ENUM	LITERAL1
+DP_TYPE_BITMAP	LITERAL1
+
+SMART_CONFIG	LITERAL1
+AP_CONFIG	LITERAL1
+
+CONFIG_MODE_DEFAULT	LITERAL1
+CONFIG_MODE_LOWPOWER	LITERAL1
+CONFIG_MODE_SPECIAL	LITERAL1
