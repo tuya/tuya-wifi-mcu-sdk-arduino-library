@@ -8,6 +8,10 @@ Tuya MCU SDK Arduino Library is developed based on the Tuya Wi-Fi general integr
 <img src="https://images.tuyacn.com/smart/shiliu_zone/Tuya_Arduino_library/mcu_wifi_connect.png"/>
 </div>
 
+## [Tuya Beta Test Program](https://pages.tuya.com/develop/ArduinoBetaTest_discord?_source=f21d8ebfe2cde74110e27b26366a81f3)
+Now welcome to join the [Tuya Beta Test Program](https://pages.tuya.com/develop/ArduinoBetaTest_discord?_source=f21d8ebfe2cde74110e27b26366a81f3) to get your development gifts and make your own arduino projects with Tuya Support. Your feedback is helpful and valuable to the whole community.
+![image](https://user-images.githubusercontent.com/85163056/126034859-0b9b8856-0556-4d3f-a201-a6951172c080.png)
+
 
 
 ## Document introduction
@@ -40,7 +44,7 @@ When you use this library for development with Arduino, you must add the header 
 
 Every product that is created on the Tuya IoT Platform will have a unique product ID (PID). The PID is associated with all information related to this product, including specific DP, app control panel, and delivery information.
 
-In `unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)`, the PID is obtained after you create a product on the [Tuya IoT Platform](https://iot.tuya.com/?_source=97c44038fafc20e9c8dd5fdb508cc9c2). The PID of a Wi-Fi product is typically 16 bytes. The `mcu_ver` parameter is the version number of the software. Pay attention to this parameter if you want to support OTA updates of the MCU.
+In `unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)`, the PID is obtained after you create a product on the [Tuya IoT Platform](http://iot.tuya.com/?_source=bcd157afd1c16c931b7b44381c9fe884). The PID of a Wi-Fi product is typically 16 bytes. The `mcu_ver` parameter is the version number of the software. Pay attention to this parameter if you want to support OTA updates of the MCU.
 > **Note**: The current version of the library does not support the OTA feature.
 
 ```c
@@ -70,7 +74,7 @@ void loop()
 
 ### 2. Pass in the DP information to the MCU SDK
 
-Create products on the [Tuya IoT Platform](https://iot.tuya.com/?_source=97c44038fafc20e9c8dd5fdb508cc9c2) and get information on product DP points.
+Create products on the [Tuya IoT Platform](http://iot.tuya.com/?_source=bcd157afd1c16c931b7b44381c9fe884) and get information on product DP points.
 
 A data point (DP) represents a smart device function.
 
@@ -273,7 +277,7 @@ void dp_update_all(void)
 
 You can get support for Tuya by using the following methods:
 
-- Developer Centre: https://developer.tuya.com
-- Help Centre: https://support.tuya.com/help
-- Technical Support Work Order Centre: https://service.console.tuya.com 
+- Developer Centre: https://developer.tuya.com?_source=d3b1d41903c59173453028c00b26eda6
+- Help Centre: https://support.tuya.com/en/help?_source=9e55ab864ce95b016070141319a5206f
+- Technical Support Work Order Centre: https://service.console.tuya.com?_source=5817a709f62789fbeb91c94062bf8993 
 
