@@ -30,7 +30,7 @@ void TuyaUart::wifi_protocol_init(void)
     rx_buf_in = (unsigned char *)wifi_uart_rx_buf;
     rx_buf_out = (unsigned char *)wifi_uart_rx_buf;
 
-    stop_update_flag = DISABLE;
+    stop_update_flag = TY_DISABLE;
 
 #ifndef WIFI_CONTROL_SELF_MODE
     wifi_work_state = WIFI_SATE_UNKNOW;
@@ -47,12 +47,12 @@ unsigned char TuyaUart::uart_receive_input(unsigned char data)
     if (1 == rx_buf_out - rx_buf_in)
     {
         //UART receive buffer is full
-        return ERROR;
+        return TY_ERROR;
     }
     else if ((rx_buf_in > rx_buf_out) && ((unsigned long)(rx_buf_in - rx_buf_out) >= sizeof(wifi_uart_rx_buf)))
     {
         //UART receive buffer is full
-        return ERROR;
+        return TY_ERROR;
     }
     else
     {
@@ -64,7 +64,7 @@ unsigned char TuyaUart::uart_receive_input(unsigned char data)
 
         *rx_buf_in++ = data;
     }
-    return SUCCESS;
+    return TY_SUCCESS;
 }
 
 void TuyaUart::uart_receive_buff_input(unsigned char value[], unsigned short data_len)
@@ -157,13 +157,13 @@ unsigned short TuyaUart::set_wifi_uart_buffer(unsigned short dest, const unsigne
 
 void TuyaUart::set_serial(HardwareSerial *serial)
 {
-    _isHWSerial = TRUE;
+    _isHWSerial = TY_TRUE;
     _port = serial;
 }
 
 void TuyaUart::set_serial(SoftwareSerial *serial)
 {
-    _isHWSerial = FALSE;
+    _isHWSerial = TY_FALSE;
     _port = serial;
 }
 

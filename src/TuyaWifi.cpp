@@ -22,6 +22,7 @@ TuyaUart tuya_uart;
 TuyaDataPoint tuya_dp;
 
 /* Constants required to report product information */
+/* Here "key" means key-value */
 unsigned char pid_key[] = {"{\"p\":\""}; 
 unsigned char mcu_ver_key[] = {"\",\"v\":\""};
 unsigned char mode_key[] = {"\",\"m\":"};
@@ -53,7 +54,7 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
 {
     if (pid == NULL || mcu_ver == NULL)
     {
-        return ERROR;
+        return TY_ERROR;
     }
 
     if (tuya_tools.my_strlen(pid) <= PID_LEN)
@@ -63,7 +64,7 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
     else
     {
         tuya_tools.my_memcpy(product_id, pid, PID_LEN);
-        return ERROR;
+        return TY_ERROR;
     }
 
     if (tuya_tools.my_strlen(mcu_ver) <= VER_LEN)
@@ -73,10 +74,10 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
     else
     {
         tuya_tools.my_memcpy(mcu_ver_value, mcu_ver, VER_LEN);
-        return ERROR;
+        return TY_ERROR;
     }
 
-    return SUCCESS;
+    return TY_SUCCESS;
 }
 
 /**
@@ -94,7 +95,7 @@ void TuyaWifi::uart_service(void)
     /* extract serial data */
     while(tuya_uart.available()) {
         ret = tuya_uart.uart_receive_input(tuya_uart.read());
-        if (ret != SUCCESS) {
+        if (ret != TY_SUCCESS) {
             break;
         }
     }
@@ -250,7 +251,7 @@ void TuyaWifi::data_handle(unsigned short offset)
             //
             ret = data_point_handle((unsigned char *)tuya_uart.wifi_data_process_buf + offset + DATA_START + i);
 
-            if (SUCCESS == ret)
+            if (TY_SUCCESS == ret)
             {
                 //Send success
             }
@@ -300,7 +301,7 @@ void TuyaWifi::data_handle(unsigned short offset)
         if (firm_update_flag == UPDATE_START_CMD)
         {
             //Stop all data reporting
-            stop_update_flag = ENABLE;
+            stop_update_flag = TY_ENABLE;
 
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
 
@@ -328,15 +329,15 @@ void TuyaWifi::data_handle(unsigned short offset)
             else
             {
                 firm_update_flag = 0;
-                ret = ERROR;
+                ret = TY_ERROR;
             }
 
-            if (ret == SUCCESS)
+            if (ret == TY_SUCCESS)
             {
                 wifi_uart_write_frame(UPDATE_TRANS_CMD, MCU_TX_VER, 0);
             }
             //Restore all data reported
-            stop_update_flag = DISABLE;
+            stop_update_flag = TY_DISABLE;
         }
         break;
 #endif
@@ -479,10 +480,10 @@ void TuyaWifi::data_handle(unsigned short offset)
             else
             {
                 file_download_flag = 0;
-                ret = ERROR;
+                ret = TY_ERROR;
             }
 
-            if (ret == SUCCESS)
+            if (ret == TY_SUCCESS)
             {
                 wifi_uart_write_frame(FILE_DOWNLOAD_TRANS_CMD, MCU_TX_VER, 0);
             }
@@ -591,7 +592,7 @@ unsigned char TuyaWifi::data_point_handle(const unsigned char value[])
     if (dp_type != download_cmd[index][1])
     {
         //Error message
-        return FALSE;
+        return TY_FALSE;
     }
     else
     {
@@ -629,16 +630,16 @@ void TuyaWifi::dp_update_all_func_register(tuya_callback_dp_update_all _func)
 void TuyaWifi::heat_beat_check(void)
 {
     unsigned char length = 0;
-    static unsigned char mcu_reset_state = FALSE;
+    static unsigned char mcu_reset_state = TY_FALSE;
 
-    if (FALSE == mcu_reset_state)
+    if (TY_FALSE == mcu_reset_state)
     {
-        length = tuya_uart.set_wifi_uart_byte(length, FALSE);
-        mcu_reset_state = TRUE;
+        length = tuya_uart.set_wifi_uart_byte(length, TY_FALSE);
+        mcu_reset_state = TY_TRUE;
     }
     else
     {
-        length = tuya_uart.set_wifi_uart_byte(length, TRUE);
+        length = tuya_uart.set_wifi_uart_byte(length, TY_TRUE);
     }
 
     tuya_uart.wifi_uart_write_frame(HEAT_BEAT_CMD, MCU_TX_VER, length);

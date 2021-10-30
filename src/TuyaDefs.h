@@ -13,40 +13,40 @@
 #define __TUYA_DEFS_H__
 
 /* Define constant */
-#ifndef TRUE
-#define TRUE 1
+#ifndef TY_TRUE
+#define TY_TRUE 1
 #endif
 
-#ifndef FALSE
-#define FALSE 0
+#ifndef TY_FALSE
+#define TY_FALSE 0
 #endif
 
-#ifndef NULL
+#ifndef TY_NULL
 #ifdef __cplusplus
-#define NULL    0
+#define TY_NULL    0
 #else
-#define NULL   ((void *)0)
+#define TY_NULL   ((void *)0)
 #endif 
 #endif
 
-#ifndef SUCCESS
-#define SUCCESS 1
+#ifndef TY_SUCCESS
+#define TY_SUCCESS 1
 #endif
 
-#ifndef ERROR
-#define ERROR 0
+#ifndef TY_ERROR
+#define TY_ERROR 0
 #endif
 
-#ifndef INVALID
-#define INVALID 0xFF
+#ifndef TY_INVALID
+#define TY_INVALID 0xFF
 #endif
 
-#ifndef ENABLE
-#define ENABLE 1
+#ifndef TY_ENABLE
+#define TY_ENABLE 1
 #endif
 
-#ifndef DISABLE
-#define DISABLE 0
+#ifndef TY_DISABLE
+#define TY_DISABLE 0
 #endif
 
 #define MCU_RX_VER      0x00    //Module send frame protocol version number
