@@ -2,9 +2,9 @@
  * @FileName: SHT30_DIS.ino
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-21 15:23:49
- * @LastEditTime: 2021-04-28 19:51:42
+ * @LastEditTime: 2021-11-01 10:01:57
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: 
@@ -179,7 +179,7 @@ unsigned char sht30_crc(unsigned char *data, unsigned int count)
 unsigned char dp_process(unsigned char dpid,const unsigned char value[], unsigned short length)
 {
   /* all DP only report */
-  return SUCCESS;
+  return TY_SUCCESS;
 }
 
 /**

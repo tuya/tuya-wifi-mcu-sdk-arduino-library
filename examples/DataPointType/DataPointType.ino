@@ -2,9 +2,9 @@
  * @FileName: DataPointType.ino
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-19 14:31:52
- * @LastEditTime: 2021-04-28 19:47:36
+ * @LastEditTime: 2021-11-01 10:02:07
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: 
@@ -172,7 +172,7 @@ unsigned char dp_process(unsigned char dpid, const unsigned char value[], unsign
             break;
     }
     
-    return SUCCESS;
+    return TY_SUCCESS;
 }
 
 /**

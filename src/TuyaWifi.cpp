@@ -2,9 +2,9 @@
  * @FileName: Tuya.cpp
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 11:25:17
- * @LastEditTime: 2021-04-28 19:50:21
+ * @LastEditTime: 2021-11-01 14:07:57
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: The functions that the user needs to actively call are in this file.
@@ -20,13 +20,14 @@
 TuyaTools tuya_tools;
 TuyaUart tuya_uart;
 TuyaDataPoint tuya_dp;
+TuyaExtras tuya_extras;
 
 /* Constants required to report product information */
 /* Here "key" means key-value */
-unsigned char pid_key[] = {"{\"p\":\""}; 
-unsigned char mcu_ver_key[] = {"\",\"v\":\""};
-unsigned char mode_key[] = {"\",\"m\":"};
-unsigned char product_info_end[] = {"}"};
+const unsigned char pid_key[] = {"{\"p\":\""}; 
+const unsigned char mcu_ver_key[] = {"\",\"v\":\""};
+const unsigned char mode_key[] = {"\",\"m\":"};
+const unsigned char product_info_end[] = {"}"};
 
 /* Protocol serial port initialization */
 TuyaWifi::TuyaWifi(void)
@@ -141,11 +142,10 @@ void TuyaWifi::uart_service(void)
             break;
         }
 
-        //数据接收完成
+        //data receive finish
         if (tuya_tools.get_check_sum((unsigned char *)tuya_uart.wifi_data_process_buf + offset, rx_value_len - 1) != tuya_uart.wifi_data_process_buf[offset + rx_value_len - 1])
         {
-            //校验出错
-            //printf("crc error (crc:0x%X  but data:0x%X)\r\n",get_check_sum((unsigned char *)wifi_data_process_buf + offset,rx_value_len - 1),wifi_data_process_buf[offset + rx_value_len - 1]);
+            //check error
             offset += 3;
             continue;
         }
@@ -344,7 +344,7 @@ void TuyaWifi::data_handle(unsigned short offset)
 
 #ifdef SUPPORT_GREEN_TIME
     case GET_ONLINE_TIME_CMD: //Get system time (Greenwich Mean Time)
-        mcu_get_greentime((unsigned char *)(wifi_data_process_buf + offset + DATA_START));
+        tuya_extras.mcu_get_greentime((unsigned char *)(tuya_uart.wifi_data_process_buf + offset + DATA_START), &_green_time);
         break;
 #endif
 
@@ -993,3 +993,32 @@ void TuyaWifi::mcu_reset_wifi(void)
     
     tuya_uart.wifi_uart_write_frame(WIFI_RESET_CMD, MCU_TX_VER, 0);
 }
+
+#if SUPPORT_GREEN_TIME
+char TuyaWifi::get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout)
+{
+    unsigned long get_green_time_begin = 0;
+    if (TY_NULL == time) {
+        return -1;
+    }
+
+    if (WIFI_CONN_CLOUD != mcu_get_wifi_work_state()) {
+        return -1;
+    }
+
+    /* 1.request green time */
+    tuya_extras.mcu_request_green_time();
+    /* 2.wait for green time */
+    get_green_time_begin = millis();
+    while (millis()<(get_green_time_begin + timeout)) {
+        uart_service();
+        if (1 == _green_time.update_flag) { /* request green time success */
+            tuya_tools.my_memcpy(time, &_green_time, sizeof(_green_time));
+            _green_time.update_flag = 0;
+            return TY_SUCCESS;
+        }
+    }
+    _green_time.update_flag = 0;
+    return -1; /* request green time timeout */
+}
+#endif /* SUPPORT_GREEN_TIME */

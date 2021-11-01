@@ -2,9 +2,9 @@
  * @FileName: config.h
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 11:24:27
- * @LastEditTime: 2021-04-28 19:50:37
+ * @LastEditTime: 2021-10-30 15:52:27
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: Tuya mcu sdk Arduino library config file.
@@ -15,9 +15,13 @@
 #include "TuyaDefs.h"
 
 /*  Distribution mode selection, only three choices, Anti-touch mode is recommende */
-#define CONFIG_MODE     CONFIG_MODE_DEFAULT     //Default working mode
-#define CONFIG_MODE     CONFIG_MODE_LOWPOWER    //Safe mode (low power working mode)
-#define CONFIG_MODE     CONFIG_MODE_DEFAULT     // Anti-touch mode (special working mode)
+// #define CONFIG_MODE     CONFIG_MODE_DEFAULT     //Default working mode
+// #define CONFIG_MODE     CONFIG_MODE_LOWPOWER    //Safe mode (low power working mode)
+#define CONFIG_MODE     CONFIG_MODE_SPECIAL     // Anti-touch mode (special working mode)
+
+/* some extra features defined begin */
+#define SUPPORT_GREEN_TIME      1
+/* some extra features defined end */
 
 #ifndef SUPPORT_MCU_FIRM_UPDATE
 #define WIFI_UART_RECV_BUF_LMT  32      //UART data receiving buffer size, can be reduced if the MCU has insufficient RAM
@@ -32,5 +36,6 @@
 #endif
 
 #define WIFIR_UART_SEND_BUF_LMT 64      //According to the user's DP data size, it must be greater than 48
+
 
 #endif /* __CONFIG_H__ */

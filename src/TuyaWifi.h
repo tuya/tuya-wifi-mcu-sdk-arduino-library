@@ -2,19 +2,20 @@
  * @FileName: Tuya.h 
  * @Author: Tuya
  * @Email:
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 11:25:26
- * @LastEditTime: 2021-04-28 19:47:50
+ * @LastEditTime: 2021-11-01 14:03:24
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: 
  */
-#ifndef __TUYA_H__
-#define __TUYA_H__
+#ifndef __TUYA_WIFI_H__
+#define __TUYA_WIFI_H__
 
 #include "../config.h"
 #include "TuyaDefs.h"
 #include "TuyaUart.h"
+#include "TuyaExtras.h"
 
 #ifdef TUYA_GLOBAL
 #define TUYA_GLOBAL_EXTERN
@@ -76,7 +77,14 @@ public:
     unsigned char mcu_get_wifi_work_state(void);
     void mcu_reset_wifi(void);
 
+#if SUPPORT_GREEN_TIME
+    char TuyaWifi::get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
+#endif /* SUPPORT_GREEN_TIME */
+
 private:
+#if SUPPORT_GREEN_TIME
+    volatile TUYA_WIFI_TIME _green_time;
+#endif /* SUPPORT_GREEN_TIME */
     unsigned char product_id[PID_LEN];
     unsigned char mcu_ver_value[VER_LEN];
 
@@ -93,4 +101,4 @@ private:
     unsigned char get_dowmload_dpid_index(unsigned char dpid);
 };
 
-#endif /* __TUYA_H__ */
+#endif /* __TUYA_WIFI_H__ */
