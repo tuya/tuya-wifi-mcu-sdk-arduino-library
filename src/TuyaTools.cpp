@@ -49,7 +49,7 @@ unsigned char TuyaTools::hex_to_bcd(unsigned char Value_H, unsigned char Value_L
 unsigned long TuyaTools::my_strlen(unsigned char *str)
 {
     unsigned long len = 0;
-    if (str == NULL)
+    if (str == TY_NULL)
     {
         return 0;
     }
@@ -66,9 +66,9 @@ void *TuyaTools::my_memset(void *src, unsigned char ch, unsigned short count)
 {
     unsigned char *tmp = (unsigned char *)src;
 
-    if (src == NULL)
+    if (src == TY_NULL)
     {
-        return NULL;
+        return TY_NULL;
     }
 
     while (count--)
@@ -85,9 +85,9 @@ void *TuyaTools::my_memcpy(void *dest, const void *src, unsigned short count)
     const unsigned char *psrc = (const unsigned char *)src;
     unsigned short i;
 
-    if (dest == NULL || src == NULL)
+    if (dest == TY_NULL || src == TY_NULL)
     {
-        return NULL;
+        return TY_NULL;
     }
 
     if ((pdest <= psrc) || (pdest > psrc + count))
@@ -110,9 +110,9 @@ void *TuyaTools::my_memcpy(void *dest, const void *src, unsigned short count)
 
 char *TuyaTools::my_strcpy(char *dest, const char *src)
 {
-    if ((NULL == dest) || (NULL == src))
+    if ((TY_NULL == dest) || (TY_NULL == src))
     {
-        return NULL;
+        return TY_NULL;
     }
 
     char *p = dest;

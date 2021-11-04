@@ -2,9 +2,9 @@
  * @FileName: Tuya.cpp
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 11:25:17
- * @LastEditTime: 2021-04-28 19:50:21
+ * @LastEditTime: 2021-11-04 13:58:06
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: The functions that the user needs to actively call are in this file.
@@ -20,17 +20,25 @@
 TuyaTools tuya_tools;
 TuyaUart tuya_uart;
 TuyaDataPoint tuya_dp;
+TuyaExtras tuya_extras;
 
 /* Constants required to report product information */
-unsigned char pid_key[] = {"{\"p\":\""}; 
-unsigned char mcu_ver_key[] = {"\",\"v\":\""};
-unsigned char mode_key[] = {"\",\"m\":"};
-unsigned char product_info_end[] = {"}"};
+/* Here "key" means key-value */
+const unsigned char pid_key[] = {"{\"p\":\""}; 
+const unsigned char mcu_ver_key[] = {"\",\"v\":\""};
+const unsigned char mode_key[] = {"\",\"m\":"};
+const unsigned char product_info_end[] = {"}"};
 
 /* Protocol serial port initialization */
 TuyaWifi::TuyaWifi(void)
 {
     tuya_uart.set_serial(&Serial);
+
+#if WIFI_CONTROL_SELF_MODE
+    /* nothing to do here */
+#else
+    wifi_work_state = WIFI_SATE_UNKNOW;
+#endif
 }
 
 TuyaWifi::TuyaWifi(HardwareSerial *serial)
@@ -53,7 +61,7 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
 {
     if (pid == NULL || mcu_ver == NULL)
     {
-        return ERROR;
+        return TY_ERROR;
     }
 
     if (tuya_tools.my_strlen(pid) <= PID_LEN)
@@ -63,7 +71,7 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
     else
     {
         tuya_tools.my_memcpy(product_id, pid, PID_LEN);
-        return ERROR;
+        return TY_ERROR;
     }
 
     if (tuya_tools.my_strlen(mcu_ver) <= VER_LEN)
@@ -73,10 +81,10 @@ unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
     else
     {
         tuya_tools.my_memcpy(mcu_ver_value, mcu_ver, VER_LEN);
-        return ERROR;
+        return TY_ERROR;
     }
 
-    return SUCCESS;
+    return TY_SUCCESS;
 }
 
 /**
@@ -94,7 +102,7 @@ void TuyaWifi::uart_service(void)
     /* extract serial data */
     while(tuya_uart.available()) {
         ret = tuya_uart.uart_receive_input(tuya_uart.read());
-        if (ret != SUCCESS) {
+        if (ret != TY_SUCCESS) {
             break;
         }
     }
@@ -140,11 +148,10 @@ void TuyaWifi::uart_service(void)
             break;
         }
 
-        //数据接收完成
+        //data receive finish
         if (tuya_tools.get_check_sum((unsigned char *)tuya_uart.wifi_data_process_buf + offset, rx_value_len - 1) != tuya_uart.wifi_data_process_buf[offset + rx_value_len - 1])
         {
-            //校验出错
-            //printf("crc error (crc:0x%X  but data:0x%X)\r\n",get_check_sum((unsigned char *)wifi_data_process_buf + offset,rx_value_len - 1),wifi_data_process_buf[offset + rx_value_len - 1]);
+            //check error
             offset += 3;
             continue;
         }
@@ -218,7 +225,9 @@ void TuyaWifi::data_handle(unsigned short offset)
         get_mcu_wifi_mode();
         break;
 
-#ifndef WIFI_CONTROL_SELF_MODE
+#if WIFI_CONTROL_SELF_MODE
+    /* nothing to do here */
+#else
     case WIFI_STATE_CMD: //Wifi working status
         wifi_work_state = tuya_uart.wifi_data_process_buf[offset + DATA_START];
         tuya_uart.wifi_uart_write_frame(WIFI_STATE_CMD, MCU_TX_VER, 0);
@@ -250,7 +259,7 @@ void TuyaWifi::data_handle(unsigned short offset)
             //
             ret = data_point_handle((unsigned char *)tuya_uart.wifi_data_process_buf + offset + DATA_START + i);
 
-            if (SUCCESS == ret)
+            if (TY_SUCCESS == ret)
             {
                 //Send success
             }
@@ -300,7 +309,7 @@ void TuyaWifi::data_handle(unsigned short offset)
         if (firm_update_flag == UPDATE_START_CMD)
         {
             //Stop all data reporting
-            stop_update_flag = ENABLE;
+            stop_update_flag = TY_ENABLE;
 
             total_len = (wifi_data_process_buf[offset + LENGTH_HIGH] << 8) | wifi_data_process_buf[offset + LENGTH_LOW];
 
@@ -328,28 +337,28 @@ void TuyaWifi::data_handle(unsigned short offset)
             else
             {
                 firm_update_flag = 0;
-                ret = ERROR;
+                ret = TY_ERROR;
             }
 
-            if (ret == SUCCESS)
+            if (ret == TY_SUCCESS)
             {
                 wifi_uart_write_frame(UPDATE_TRANS_CMD, MCU_TX_VER, 0);
             }
             //Restore all data reported
-            stop_update_flag = DISABLE;
+            stop_update_flag = TY_DISABLE;
         }
         break;
 #endif
 
-#ifdef SUPPORT_GREEN_TIME
+#if SUPPORT_GREEN_TIME
     case GET_ONLINE_TIME_CMD: //Get system time (Greenwich Mean Time)
-        mcu_get_greentime((unsigned char *)(wifi_data_process_buf + offset + DATA_START));
+        tuya_extras.mcu_get_green_time((unsigned char *)(tuya_uart.wifi_data_process_buf + offset + DATA_START), &_green_time);
         break;
 #endif
 
-#ifdef SUPPORT_MCU_RTC_CHECK
+#if SUPPORT_RTC_TIME
     case GET_LOCAL_TIME_CMD: //Get local time
-        mcu_write_rtctime((unsigned char *)(wifi_data_process_buf + offset + DATA_START));
+        tuya_extras.mcu_get_rtc_time((unsigned char *)(tuya_uart.wifi_data_process_buf + offset + DATA_START), &_rtc_time);
         break;
 #endif
 
@@ -479,10 +488,10 @@ void TuyaWifi::data_handle(unsigned short offset)
             else
             {
                 file_download_flag = 0;
-                ret = ERROR;
+                ret = TY_ERROR;
             }
 
-            if (ret == SUCCESS)
+            if (ret == TY_SUCCESS)
             {
                 wifi_uart_write_frame(FILE_DOWNLOAD_TRANS_CMD, MCU_TX_VER, 0);
             }
@@ -591,7 +600,7 @@ unsigned char TuyaWifi::data_point_handle(const unsigned char value[])
     if (dp_type != download_cmd[index][1])
     {
         //Error message
-        return FALSE;
+        return TY_FALSE;
     }
     else
     {
@@ -629,16 +638,16 @@ void TuyaWifi::dp_update_all_func_register(tuya_callback_dp_update_all _func)
 void TuyaWifi::heat_beat_check(void)
 {
     unsigned char length = 0;
-    static unsigned char mcu_reset_state = FALSE;
+    static unsigned char mcu_reset_state = TY_FALSE;
 
-    if (FALSE == mcu_reset_state)
+    if (TY_FALSE == mcu_reset_state)
     {
-        length = tuya_uart.set_wifi_uart_byte(length, FALSE);
-        mcu_reset_state = TRUE;
+        length = tuya_uart.set_wifi_uart_byte(length, TY_FALSE);
+        mcu_reset_state = TY_TRUE;
     }
     else
     {
-        length = tuya_uart.set_wifi_uart_byte(length, TRUE);
+        length = tuya_uart.set_wifi_uart_byte(length, TY_TRUE);
     }
 
     tuya_uart.wifi_uart_write_frame(HEAT_BEAT_CMD, MCU_TX_VER, length);
@@ -695,10 +704,10 @@ void TuyaWifi::get_mcu_wifi_mode(void)
 {
     unsigned char length = 0;
 
-#ifdef WIFI_CONTROL_SELF_MODE //Module self-processing
-    length = tuya_uart.set_wifi_uart_byte(length, WF_STATE_KEY);
-    length = tuya_uart.set_wifi_uart_byte(length, WF_RESERT_KEY);
-#else
+#if WIFI_CONTROL_SELF_MODE //Module self-processing
+    length = tuya_uart.set_wifi_uart_byte(length, wifi_state_led);
+    length = tuya_uart.set_wifi_uart_byte(length, wifi_reset_key);
+#else 
     //No need to process data
 #endif
 
@@ -940,7 +949,27 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, int value, unsigned sh
     return ret;
 }
 
+#if WIFI_CONTROL_SELF_MODE
 
+void TuyaWifi::set_state_pin(unsigned char led_pin, unsigned char key_pin)
+{
+    wifi_state_led = led_pin;
+    wifi_reset_key = key_pin;
+}
+#else
+/**
+ * @brief  Get set wifi status success flag
+ * @param  Null
+ * @return wifimode flag
+ * -           0(SET_WIFICONFIG_ERROR):failure
+ * -           1(SET_WIFICONFIG_SUCCESS):success
+ * @note   1:The MCU actively calls to obtain whether the reset wifi is successful through the mcu_get_reset_wifi_flag() function.
+ *         2:If the module is in self-processing mode, the MCU does not need to call this function.
+ */
+unsigned char TuyaWifi::mcu_get_wifimode_flag(void)
+{
+    return set_wifimode_flag;
+}
 
 /**
  * @description: MCU set wifi working mode
@@ -961,6 +990,34 @@ void TuyaWifi::mcu_set_wifi_mode(unsigned char mode)
 }
 
 /**
+ * @brief  MCU gets reset wifi success flag
+ * @param  Null
+ * @return Reset flag
+ * -           0(RESET_WIFI_ERROR):failure
+ * -           1(RESET_WIFI_SUCCESS):success
+ * @note   1:The MCU actively calls mcu_reset_wifi() and calls this function to get the reset state.
+ *         2:If the module is in self-processing mode, the MCU does not need to call this function.
+ */
+unsigned char TuyaWifi::mcu_get_reset_wifi_flag(void)
+{
+    return reset_wifi_flag;
+}
+
+/**
+ * @description: MCU actively resets wifi working mode
+ * @param {*}
+ * @return {*}
+ * @note   1:The MCU actively calls to obtain whether the reset wifi is successful through the mcu_get_reset_wifi_flag() function.
+ *         2:If the module is in self-processing mode, the MCU does not need to call this function.
+ */
+void TuyaWifi::mcu_reset_wifi(void)
+{
+    reset_wifi_flag = RESET_WIFI_ERROR;
+    
+    tuya_uart.wifi_uart_write_frame(WIFI_RESET_CMD, MCU_TX_VER, 0);
+}
+
+/**
  * @description: The MCU actively obtains the current wifi working status.
  * @param {*}
  * @return {unsigned char} wifi work state
@@ -977,18 +1034,74 @@ unsigned char TuyaWifi::mcu_get_wifi_work_state(void)
 {
     return wifi_work_state;
 }
+#endif /* WIFI_CONTROL_SELF_MODE */
 
-
-/**
- * @description: MCU actively resets wifi working mode
- * @param {*}
- * @return {*}
- * @note   1:The MCU actively calls to obtain whether the reset wifi is successful through the mcu_get_reset_wifi_flag() function.
- *         2:If the module is in self-processing mode, the MCU does not need to call this function.
- */
-void TuyaWifi::mcu_reset_wifi(void)
+#if SUPPORT_GREEN_TIME
+char TuyaWifi::get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout)
 {
-    reset_wifi_flag = RESET_WIFI_ERROR;
-    
-    tuya_uart.wifi_uart_write_frame(WIFI_RESET_CMD, MCU_TX_VER, 0);
+    if (TY_NULL == time) {
+        return -1;
+    }
+
+#if WIFI_CONTROL_SELF_MODE
+    /* nothing to do here*/
+#else
+    if (WIFI_CONN_CLOUD != mcu_get_wifi_work_state()) {
+        return -1;
+    }
+#endif
+
+    unsigned long get_green_time_begin = 0;
+    unsigned int delay_time = 100;
+
+    if (timeout > 10) {
+        delay_time = timeout;
+    }
+
+    /* 1.request green time */
+    tuya_extras.mcu_request_green_time();
+    /* 2.wait for green time */
+    get_green_time_begin = millis();
+    while (millis()<(get_green_time_begin + timeout)) {
+        uart_service();
+        if (1 == _green_time.update_flag) { /* request green time success */
+            tuya_tools.my_memcpy(time, &_green_time, sizeof(_green_time));
+            _green_time.update_flag = 0;
+            return TY_SUCCESS;
+        }
+    }
+    _green_time.update_flag = 0;
+    return -2; /* request green time timeout */
 }
+#endif /* SUPPORT_GREEN_TIME */
+
+#if SUPPORT_RTC_TIME
+char TuyaWifi::get_rtc_time(TUYA_WIFI_TIME *time, const unsigned int timeout)
+{
+    unsigned long get_rtc_time_begin = 0;
+    unsigned int delay_time = 100;
+
+    if (TY_NULL == time) {
+        return -1;
+    }
+
+    if (timeout > 10) {
+        delay_time = timeout;
+    }
+
+    /* 1.request rtc time */
+    tuya_extras.mcu_request_rtc_time();
+    /* 2.wait for rtc time */
+    get_rtc_time_begin = millis();
+    while (millis()<(get_rtc_time_begin + delay_time)) {
+        uart_service();
+        if (1 == _rtc_time.update_flag) { /* request rtc time success */
+            tuya_tools.my_memcpy(time, &_rtc_time, sizeof(_rtc_time));
+            _rtc_time.update_flag = 0;
+            return TY_SUCCESS;
+        }
+    }
+    _rtc_time.update_flag = 0;
+    return -2; /* request rtc time timeout */
+}
+#endif /* SUPPORT_RTC_TIME */

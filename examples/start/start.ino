@@ -2,9 +2,9 @@
  * @FileName: start.ino
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 11:24:27
- * @LastEditTime: 2021-04-28 19:48:31
+ * @LastEditTime: 2021-11-04 11:06:13
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: This demo is based on the Arduino UNO, and the LEDs on the UNO board are controlled by the Tuya Smart App. 
@@ -117,7 +117,7 @@ unsigned char dp_process(unsigned char dpid,const unsigned char value[], unsigne
 
     default:break;
   }
-  return SUCCESS;
+  return TY_SUCCESS;
 }
 
 /**
