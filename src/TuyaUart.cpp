@@ -2,9 +2,9 @@
  * @FileName: TuyaUart.cpp
  * @Author: Tuya
  * @Email: 
- * @LastEditors: Tuya
+ * @LastEditors: shiliu
  * @Date: 2021-04-10 15:34:37
- * @LastEditTime: 2021-04-28 19:49:55
+ * @LastEditTime: 2021-11-04 11:03:14
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: Tuya mcu sdk Arduino library about uart buffer, data receiving and sending.
@@ -31,10 +31,6 @@ void TuyaUart::wifi_protocol_init(void)
     rx_buf_out = (unsigned char *)wifi_uart_rx_buf;
 
     stop_update_flag = TY_DISABLE;
-
-#ifndef WIFI_CONTROL_SELF_MODE
-    wifi_work_state = WIFI_SATE_UNKNOW;
-#endif
 }
 
 void TuyaUart::uart_transmit_output(unsigned char value)

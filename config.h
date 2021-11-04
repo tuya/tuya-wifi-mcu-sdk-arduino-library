@@ -4,7 +4,7 @@
  * @Email: 
  * @LastEditors: shiliu
  * @Date: 2021-04-10 11:24:27
- * @LastEditTime: 2021-10-30 15:52:27
+ * @LastEditTime: 2021-11-04 14:00:42
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: Tuya mcu sdk Arduino library config file.
@@ -20,7 +20,9 @@
 #define CONFIG_MODE     CONFIG_MODE_SPECIAL     // Anti-touch mode (special working mode)
 
 /* some extra features defined begin */
+#define WIFI_CONTROL_SELF_MODE  0
 #define SUPPORT_GREEN_TIME      1
+#define SUPPORT_RTC_TIME        1
 /* some extra features defined end */
 
 #ifndef SUPPORT_MCU_FIRM_UPDATE

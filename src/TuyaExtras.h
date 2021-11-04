@@ -4,7 +4,7 @@
  * @Email:
  * @LastEditors: shiliu
  * @Date: 2021-10-30 15:49:00
- * @LastEditTime: 2021-10-30 17:07:52
+ * @LastEditTime: 2021-11-01 19:31:15
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: 
@@ -37,8 +37,13 @@ class TuyaExtras
 public:
 #if SUPPORT_GREEN_TIME
     void mcu_request_green_time(void);
-    void mcu_get_greentime(unsigned char time[], TUYA_WIFI_TIME *tuya_time);
+    void mcu_get_green_time(unsigned char time[], TUYA_WIFI_TIME *tuya_time);
 #endif /* SUPPORT_GREEN_TIME */
+
+#if SUPPORT_RTC_TIME
+    void mcu_request_rtc_time(void);
+    void mcu_get_rtc_time(unsigned char time[], TUYA_WIFI_TIME *tuya_time);
+#endif /* SUPPORT_RTC_TIME */
 
 private:
 };

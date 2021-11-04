@@ -4,7 +4,7 @@
  * @Email:
  * @LastEditors: shiliu
  * @Date: 2021-04-10 11:25:26
- * @LastEditTime: 2021-11-01 14:03:24
+ * @LastEditTime: 2021-11-04 12:01:38
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
  * @Description: 
@@ -31,12 +31,6 @@ extern TuyaUart tuya_uart;
 #define VER_LEN 5
 
 TUYA_GLOBAL_EXTERN volatile unsigned char stop_update_flag; //ENABLE:Stop all data uploads   DISABLE:Restore all data uploads
-
-#ifndef WIFI_CONTROL_SELF_MODE
-TUYA_GLOBAL_EXTERN volatile unsigned char reset_wifi_flag;   //Reset wifi flag (TRUE: successful / FALSE: failed)
-TUYA_GLOBAL_EXTERN volatile unsigned char set_wifimode_flag; //Set the WIFI working mode flag (TRUE: Success / FALSE: Failed)
-TUYA_GLOBAL_EXTERN volatile unsigned char wifi_work_state;   //Wifi module current working status
-#endif
 
 extern "C"
 {
@@ -73,18 +67,44 @@ public:
     unsigned char mcu_dp_update(unsigned char dpid, unsigned int value, unsigned short len);
     unsigned char mcu_dp_update(unsigned char dpid, int value, unsigned short len);
 
+#if WIFI_CONTROL_SELF_MODE
+    void set_state_pin(unsigned char led_pin, unsigned char key_pin);
+#else
+    unsigned char mcu_get_wifimode_flag(void);
     void mcu_set_wifi_mode(unsigned char mode);
-    unsigned char mcu_get_wifi_work_state(void);
+    unsigned char mcu_get_reset_wifi_flag(void);
     void mcu_reset_wifi(void);
+    unsigned char mcu_get_wifi_work_state(void);
+#endif /* WIFI_CONTROL_SELF_MODE */
 
 #if SUPPORT_GREEN_TIME
     char TuyaWifi::get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
 #endif /* SUPPORT_GREEN_TIME */
 
+#if SUPPORT_RTC_TIME
+    char TuyaWifi::get_rtc_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
+#endif /* SUPPORT_GREEN_TIME */
+
+
 private:
+
+#if WIFI_CONTROL_SELF_MODE
+    volatile unsigned char wifi_state_led = 16;
+    volatile unsigned char wifi_reset_key = 28;
+#else
+    volatile unsigned char reset_wifi_flag;   //Reset wifi flag (TRUE: successful / FALSE: failed)
+    volatile unsigned char set_wifimode_flag; //Set the WIFI working mode flag (TRUE: Success / FALSE: Failed)
+    volatile unsigned char wifi_work_state;   //Wifi module current working status
+#endif /* WIFI_CONTROL_SELF_MODE */
+
 #if SUPPORT_GREEN_TIME
     volatile TUYA_WIFI_TIME _green_time;
 #endif /* SUPPORT_GREEN_TIME */
+
+#if SUPPORT_RTC_TIME
+    volatile TUYA_WIFI_TIME _rtc_time;
+#endif /* SUPPORT_RTC_TIME */
+
     unsigned char product_id[PID_LEN];
     unsigned char mcu_ver_value[VER_LEN];
 

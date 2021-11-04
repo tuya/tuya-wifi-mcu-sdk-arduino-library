@@ -1,31 +1,25 @@
 /*
- * @FileName: GetGreenTime.ino
+ * @FileName: start.ino
  * @Author: Tuya
  * @Email: 
  * @LastEditors: shiliu
- * @Date: 2021-11-04 14:44:25
- * @LastEditTime: 2021-11-04 14:50:21
+ * @Date: 2021-11-04 11:06:13
+ * @LastEditTime: 2021-11-04 14:29:10
  * @Copyright: HANGZHOU TUYA INFORMATION TECHNOLOGY CO.,LTD
  * @Company: http://www.tuya.com
- * @Description: get Greenwich Mean Time
+ * @Description: Note: Please read the readme!!!
+ *               Note: Please read the readme!!!
+ *               Note: Please read the readme!!!
  * @Github:https://github.com/tuya/tuya-wifi-mcu-sdk-arduino-library
  */
+
 #include <TuyaWifi.h>
 #include <SoftwareSerial.h>
 
 TuyaWifi my_device;
-SoftwareSerial DebugSerial(8,9);
-
-/* Current LED status */
-unsigned char led_state = 0;
-/* Connect network button pin */
-int key_pin = 7;
 
 /* Data point define */
 #define DPID_SWITCH 20
-
-TUYA_WIFI_TIME green_time;
-unsigned long last_get_green_time;
 
 /* Stores all DPs and their types. PS: array[][0]:dpid, array[][1]:dp type. 
  *                                     dp type(TuyaDefs.h) : DP_TYPE_RAW, DP_TYPE_BOOL, DP_TYPE_VALUE, DP_TYPE_STRING, DP_TYPE_ENUM, DP_TYPE_BITMAP
@@ -38,20 +32,10 @@ unsigned char dp_array[][2] =
 unsigned char pid[] = {"ma67l9sgmdyg3d2k"};
 unsigned char mcu_ver[] = {"1.0.0"};
 
-/* last time */
-unsigned long last_time = 0;
-
 void setup() 
 {
+  // Serial.begin(9600);
   Serial.begin(9600);
-  DebugSerial.begin(9600);
-
-  //Initialize led port, turn off led.
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
-  //Initialize networking keys.
-  pinMode(key_pin, INPUT_PULLUP);
 
   //Enter the PID and MCU software version
   my_device.init(pid, mcu_ver);
@@ -62,53 +46,15 @@ void setup()
   //register upload all DP callback function
   my_device.dp_update_all_func_register(dp_update_all);
 
-  last_time = millis();
+  /* set tuya module pin 16 as led, set tuya module pin 28 as connect wifi key.
+   * Long press 5s to enter networking mode.
+  */
+  my_device.set_state_pin(16, 28);
 }
 
 void loop() 
 {
   my_device.uart_service();
-
-  //Enter the connection network mode when Pin7 is pressed.
-  if (digitalRead(key_pin) == LOW) {
-    delay(80);
-    if (digitalRead(key_pin) == LOW) {
-      my_device.mcu_set_wifi_mode(SMART_CONFIG);
-    }
-  }
-  /* LED blinks when network is being connected */
-  if ((my_device.mcu_get_wifi_work_state() != WIFI_LOW_POWER) && (my_device.mcu_get_wifi_work_state() != WIFI_CONN_CLOUD) && (my_device.mcu_get_wifi_work_state() != WIFI_SATE_UNKNOW)) {
-    if (millis()- last_time >= 500) {
-      last_time = millis();
-
-      if (led_state == LOW) {
-        led_state = HIGH;
-      } else {
-        led_state = LOW;
-      }
-      digitalWrite(LED_BUILTIN, led_state);
-    }
-  }
-
-  /* 5s get Greenwich Mean Time */
-  if (millis() - last_get_green_time >= 3000) {
-    last_get_green_time = millis();
-    if (TY_SUCCESS == my_device.get_green_time(&green_time, 100)) { /* if network lag, you can increase the timeout */
-      DebugSerial.print(green_time.year);
-      DebugSerial.print("-");
-      DebugSerial.print(green_time.month);
-      DebugSerial.print("-");
-      DebugSerial.println(green_time.day);
-
-      DebugSerial.print(green_time.hour);
-      DebugSerial.print(":");
-      DebugSerial.print(green_time.minute);
-      DebugSerial.print(":");
-      DebugSerial.println(green_time.second);
-    } else {
-      DebugSerial.println("get green time failed");
-    }
-  }
 
   delay(10);
 }
@@ -150,4 +96,3 @@ void dp_update_all(void)
 {
   my_device.mcu_dp_update(DPID_SWITCH, led_state, 1);
 }
-
