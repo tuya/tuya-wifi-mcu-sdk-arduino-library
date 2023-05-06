@@ -23,7 +23,7 @@ void TuyaExtras::mcu_request_green_time(void)
 
 void TuyaExtras::mcu_get_green_time(unsigned char time[], TUYA_WIFI_TIME *tuya_time)
 {
-    if (time == NULL || tuya_time == NULL) {
+    if (time == TY_NULL || tuya_time == TY_NULL) {
         return;
     }
 
@@ -50,7 +50,7 @@ void TuyaExtras::mcu_request_rtc_time(void)
 
 void TuyaExtras::mcu_get_rtc_time(unsigned char time[], TUYA_WIFI_TIME *tuya_time)
 {
-    if (time == NULL || tuya_time == NULL) {
+    if (time == TY_NULL || tuya_time == TY_NULL) {
         return;
     }
 

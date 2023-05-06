@@ -12,7 +12,6 @@
 
 #define TUYA_GLOBAL
 
-#include <Arduino.h>
 #include <TuyaWifi.h>
 #include "TuyaTools.h"
 #include "TuyaDataPoint.h"
@@ -24,10 +23,10 @@ TuyaExtras tuya_extras;
 
 /* Constants required to report product information */
 /* Here "key" means key-value */
-const unsigned char pid_key[] = {"{\"p\":\""}; 
-const unsigned char mcu_ver_key[] = {"\",\"v\":\""};
-const unsigned char mode_key[] = {"\",\"m\":"};
-const unsigned char product_info_end[] = {"}"};
+static unsigned char pid_key[] = {"{\"p\":\""}; 
+static unsigned char mcu_ver_key[] = {"\",\"v\":\""};
+static unsigned char mode_key[] = {"\",\"m\":"};
+static unsigned char product_info_end[] = {"}"};
 
 /* Protocol serial port initialization */
 TuyaWifi::TuyaWifi(void)
@@ -41,12 +40,7 @@ TuyaWifi::TuyaWifi(void)
 #endif
 }
 
-TuyaWifi::TuyaWifi(HardwareSerial *serial)
-{
-    tuya_uart.set_serial(serial);
-}
-
-TuyaWifi::TuyaWifi(SoftwareSerial *serial)
+TuyaWifi::TuyaWifi(TY_UART *serial)
 {
     tuya_uart.set_serial(serial);
 }
@@ -59,7 +53,7 @@ TuyaWifi::TuyaWifi(SoftwareSerial *serial)
  */
 unsigned char TuyaWifi::init(unsigned char *pid, unsigned char *mcu_ver)
 {
-    if (pid == NULL || mcu_ver == NULL)
+    if (pid == TY_NULL || mcu_ver == TY_NULL)
     {
         return TY_ERROR;
     }
@@ -176,7 +170,7 @@ void TuyaWifi::uart_service(void)
 void TuyaWifi::data_handle(unsigned short offset)
 {
 #ifdef SUPPORT_MCU_FIRM_UPDATE
-    unsigned char *firmware_addr = NULL;
+    unsigned char *firmware_addr = TY_NULL;
     static unsigned short firm_size;           //Upgrade package size
     static unsigned long firm_length;          //MCU upgrade file length
     static unsigned char firm_update_flag = 0; //MCU upgrade flag
@@ -205,7 +199,7 @@ void TuyaWifi::data_handle(unsigned short offset)
 #endif
 
 #ifdef FILE_DOWNLOAD_ENABLE
-    unsigned char *file_data_addr = NULL;
+    unsigned char *file_data_addr = TY_NULL;
     static unsigned short file_package_size = 0; //File packet size
     static unsigned char file_download_flag = 0; //File download flag
     unsigned int file_download_size = 0;
@@ -723,7 +717,7 @@ void TuyaWifi::get_mcu_wifi_mode(void)
  */
 unsigned long TuyaWifi::mcu_get_dp_download_data(unsigned char dpid, const unsigned char value[], unsigned short len)
 {
-    unsigned long ret;
+    unsigned long ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
     case DP_TYPE_BOOL:
@@ -753,7 +747,7 @@ unsigned long TuyaWifi::mcu_get_dp_download_data(unsigned char dpid, const unsig
  */
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, const unsigned char value[], unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_RAW:
@@ -789,7 +783,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, const unsigned char va
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned char value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:
@@ -816,7 +810,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned char value, u
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, char value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:
@@ -843,7 +837,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, char value, unsigned s
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned long value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:
@@ -870,7 +864,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned long value, u
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, long value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:
@@ -897,7 +891,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, long value, unsigned s
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned int value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:
@@ -924,7 +918,7 @@ unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, unsigned int value, un
 
 unsigned char TuyaWifi::mcu_dp_update(unsigned char dpid, int value, unsigned short len)
 {
-    unsigned char ret;
+    unsigned char ret = 0;
     switch (download_cmd[get_dowmload_dpid_index(dpid)][1])
     {
         case DP_TYPE_BOOL:

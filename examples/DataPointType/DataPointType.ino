@@ -12,10 +12,11 @@
  */
 
 #include <TuyaWifi.h>
-#include <SoftwareSerial.h>
+
+// STM32
+// HardwareSerial Serial2(PA_3, PA_2);
 
 TuyaWifi my_device;
-SoftwareSerial DebugSerial(8,9);
 
 /* Current LED status */
 unsigned char led_state = 0;
@@ -59,7 +60,7 @@ unsigned long last_time = 0;
 void setup()
 {
     Serial.begin(9600);
-    DebugSerial.begin(9600);
+    Serial2.begin(9600);
 
     //Initialize led port, turn off led.
     pinMode(LED_BUILTIN, OUTPUT);
@@ -121,49 +122,49 @@ unsigned char dp_process(unsigned char dpid, const unsigned char value[], unsign
 {
     switch (dpid) {
         case DPID_BOOL:
-            DebugSerial.println("Bool type:");
+            Serial2.println("Bool type:");
             dp_bool_value = my_device.mcu_get_dp_download_data(dpid, value, length);
-            DebugSerial.println(dp_bool_value);
+            Serial2.println(dp_bool_value);
             /* After processing the download DP command, the current status should be reported. */
             my_device.mcu_dp_update(DPID_BOOL, dp_bool_value, 1);
         break;
             
         case DPID_VALUE:
-            DebugSerial.println("Value type:");
+            Serial2.println("Value type:");
             dp_value_value = my_device.mcu_get_dp_download_data(DPID_VALUE, value, length);
-            DebugSerial.println(dp_value_value);
+            Serial2.println(dp_value_value);
             /* After processing the download DP command, the current status should be reported. */
             my_device.mcu_dp_update(DPID_VALUE, dp_value_value, 1);
         break;
 
         case DPID_ENUM:
-            DebugSerial.println("Enum type:");
+            Serial2.println("Enum type:");
             dp_enum_value = my_device.mcu_get_dp_download_data(dpid, value, length);
-            DebugSerial.println(dp_enum_value);
+            Serial2.println(dp_enum_value);
             /* After processing the download DP command, the current status should be reported. */
             my_device.mcu_dp_update(DPID_ENUM, dp_enum_value, 1);
         break;
 
         case DPID_STRING:
-            DebugSerial.println("String type:");
+            Serial2.println("String type:");
             /*  */
             for (unsigned int i=0; i<length; i++) {
                 dp_string_value[i] = value[i];
-                DebugSerial.write(dp_string_value[i]);
+                Serial2.write(dp_string_value[i]);
             }
-            DebugSerial.println("");
+            Serial2.println("");
             /* After processing the download DP command, the current status should be reported. */
             my_device.mcu_dp_update(DPID_STRING, dp_string_value, length);
         break;
 
         case DPID_RAW:
-            DebugSerial.println("Raw type:");
+            Serial2.println("Raw type:");
             /*  */
             for (unsigned int i=0; i<length; i++) {
                 dp_raw_value[i] = value[i];
-                DebugSerial.write(dp_raw_value[i]);
+                Serial2.write(dp_raw_value[i]);
             }
-            DebugSerial.println("");
+            Serial2.println("");
             /* After processing the download DP command, the current status should be reported. */
             my_device.mcu_dp_update(DPID_RAW, dp_raw_value, length);
         break;

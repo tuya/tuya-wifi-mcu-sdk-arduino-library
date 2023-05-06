@@ -15,9 +15,9 @@
 #include "TuyaDefs.h"
 
 /*  Distribution mode selection, only three choices, Anti-touch mode is recommende */
-// #define CONFIG_MODE     CONFIG_MODE_DEFAULT     //Default working mode
+#define CONFIG_MODE     CONFIG_MODE_DEFAULT     //Default working mode
 // #define CONFIG_MODE     CONFIG_MODE_LOWPOWER    //Safe mode (low power working mode)
-#define CONFIG_MODE     CONFIG_MODE_SPECIAL     // Anti-touch mode (special working mode)
+// #define CONFIG_MODE     CONFIG_MODE_SPECIAL     // Anti-touch mode (special working mode)
 
 /* some extra features defined begin */
 #define WIFI_CONTROL_SELF_MODE  0
