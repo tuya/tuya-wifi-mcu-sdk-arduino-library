@@ -12,6 +12,8 @@
 #ifndef __TUYA_WIFI_H__
 #define __TUYA_WIFI_H__
 
+#include <Arduino.h>
+
 #include "../config.h"
 #include "TuyaDefs.h"
 #include "TuyaUart.h"
@@ -42,8 +44,7 @@ class TuyaWifi
 {
 public:
     TuyaWifi(void);
-    TuyaWifi(HardwareSerial *serial);
-    TuyaWifi(SoftwareSerial *serial);
+    TuyaWifi(TY_UART *serial);
 
     unsigned char init(unsigned char *pid, unsigned char *mcu_ver);
     void uart_service(void);
@@ -78,31 +79,31 @@ public:
 #endif /* WIFI_CONTROL_SELF_MODE */
 
 #if SUPPORT_GREEN_TIME
-    char TuyaWifi::get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
+    char get_green_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
 #endif /* SUPPORT_GREEN_TIME */
 
 #if SUPPORT_RTC_TIME
-    char TuyaWifi::get_rtc_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
+    char get_rtc_time(TUYA_WIFI_TIME *time, const unsigned int timeout);
 #endif /* SUPPORT_GREEN_TIME */
 
 
 private:
 
 #if WIFI_CONTROL_SELF_MODE
-    volatile unsigned char wifi_state_led = 16;
-    volatile unsigned char wifi_reset_key = 28;
+    unsigned char wifi_state_led = 16;
+    unsigned char wifi_reset_key = 28;
 #else
-    volatile unsigned char reset_wifi_flag;   //Reset wifi flag (TRUE: successful / FALSE: failed)
-    volatile unsigned char set_wifimode_flag; //Set the WIFI working mode flag (TRUE: Success / FALSE: Failed)
-    volatile unsigned char wifi_work_state;   //Wifi module current working status
+    unsigned char reset_wifi_flag;   //Reset wifi flag (TRUE: successful / FALSE: failed)
+    unsigned char set_wifimode_flag; //Set the WIFI working mode flag (TRUE: Success / FALSE: Failed)
+    unsigned char wifi_work_state;   //Wifi module current working status
 #endif /* WIFI_CONTROL_SELF_MODE */
 
 #if SUPPORT_GREEN_TIME
-    volatile TUYA_WIFI_TIME _green_time;
+    TUYA_WIFI_TIME _green_time;
 #endif /* SUPPORT_GREEN_TIME */
 
 #if SUPPORT_RTC_TIME
-    volatile TUYA_WIFI_TIME _rtc_time;
+    TUYA_WIFI_TIME _rtc_time;
 #endif /* SUPPORT_RTC_TIME */
 
     unsigned char product_id[PID_LEN];

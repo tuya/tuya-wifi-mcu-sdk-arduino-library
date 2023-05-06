@@ -9,7 +9,6 @@
  * @Company: http://www.tuya.com
  * @Description: Tuya mcu sdk Arduino library about uart buffer, data receiving and sending.
  */
-#include <Arduino.h>
 #include "TuyaWifi.h"
 #include "TuyaUart.h"
 #include "TuyaTools.h"
@@ -74,7 +73,7 @@ void TuyaUart::uart_receive_buff_input(unsigned char value[], unsigned short dat
 
 unsigned char TuyaUart::take_byte_rxbuff(void)
 {
-    unsigned char date;
+    unsigned char date = 0;
 
     if (rx_buf_out != rx_buf_in)
     {
@@ -101,7 +100,7 @@ unsigned char TuyaUart::with_data_rxbuff(void)
 
 void TuyaUart::wifi_uart_write_data(unsigned char *in, unsigned short len)
 {
-    if ((NULL == in) || (0 == len))
+    if ((TY_NULL == in) || (0 == len))
     {
         return;
     }
@@ -151,50 +150,27 @@ unsigned short TuyaUart::set_wifi_uart_buffer(unsigned short dest, const unsigne
     return dest;
 }
 
-void TuyaUart::set_serial(HardwareSerial *serial)
+void TuyaUart::set_serial(TY_UART *serial)
 {
-    _isHWSerial = TY_TRUE;
-    _port = serial;
+    _serial_port = serial;
 }
 
-void TuyaUart::set_serial(SoftwareSerial *serial)
+void TuyaUart::begin(unsigned long baud_rate)
 {
-    _isHWSerial = TY_FALSE;
-    _port = serial;
+    _serial_port->begin(baud_rate);
 }
 
-void TuyaUart::begin(long baud_rate)
+int TuyaUart::read(void)
 {
-    if (_isHWSerial) {
-        static_cast<HardwareSerial*>(_port)->begin(baud_rate);
-    } else {
-        static_cast<SoftwareSerial*>(_port)->begin(baud_rate);
-    }
+    return _serial_port->read();
 }
 
-char TuyaUart::read(void)
+size_t TuyaUart::write(uint8_t c)
 {
-    if (_isHWSerial) {
-        return static_cast<HardwareSerial*>(_port)->read();
-    } else {
-        return static_cast<SoftwareSerial*>(_port)->read();
-    }
-}
-
-size_t TuyaUart::write(char value)
-{
-    if (_isHWSerial) {
-        return static_cast<HardwareSerial*>(_port)->write(value);
-    } else {
-        return static_cast<SoftwareSerial*>(_port)->write(value);
-    }
+    return _serial_port->write(c);
 }
 
 int TuyaUart::available(void)
 {
-    if (_isHWSerial) {
-        return static_cast<HardwareSerial*>(_port)->available();
-    } else {
-        return static_cast<SoftwareSerial*>(_port)->available();
-    }
+    return _serial_port->available();
 }

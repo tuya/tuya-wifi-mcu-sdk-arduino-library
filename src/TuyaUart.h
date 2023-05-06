@@ -12,18 +12,21 @@
 #ifndef __TUYA_UART_H__
 #define __TUYA_UART_H__
 
+#include <Arduino.h>
+
 #include "../config.h"
 #include "TuyaDefs.h"
-#include <SoftwareSerial.h>
+
 #include <HardwareSerial.h>
-#include <Stream.h>
+#undef TY_UART
+#define TY_UART HardwareSerial
 
 class TuyaUart
 {
 public:
-    volatile unsigned char wifi_uart_rx_buf[PROTOCOL_HEAD + WIFI_UART_RECV_BUF_LMT];     //Serial data processing buffer
-    volatile unsigned char wifi_uart_tx_buf[PROTOCOL_HEAD + WIFIR_UART_SEND_BUF_LMT];    //Serial receive buffer
-    volatile unsigned char wifi_data_process_buf[PROTOCOL_HEAD + WIFI_DATA_PROCESS_LMT]; //Serial port send buffer
+    unsigned char wifi_uart_rx_buf[PROTOCOL_HEAD + WIFI_UART_RECV_BUF_LMT];     //Serial data processing buffer
+    unsigned char wifi_uart_tx_buf[PROTOCOL_HEAD + WIFIR_UART_SEND_BUF_LMT];    //Serial receive buffer
+    unsigned char wifi_data_process_buf[PROTOCOL_HEAD + WIFI_DATA_PROCESS_LMT]; //Serial port send buffer
 
     TuyaUart(void);
     ~TuyaUart(void);
@@ -40,20 +43,16 @@ public:
     unsigned short set_wifi_uart_byte(unsigned short dest, unsigned char byte);
     unsigned short set_wifi_uart_buffer(unsigned short dest, const unsigned char *src, unsigned short len);
 
-    /* serial set */
-    bool _isHWSerial;
-
-    void set_serial(HardwareSerial *serial);
-    void set_serial(SoftwareSerial *serial);
-    void begin(long baud_rate);
-    char read(void);
-    size_t write(char value);
+    void set_serial(TY_UART *serial);
+    void begin(unsigned long baud_rate);
+    int read(void);
+    size_t write(uint8_t c);
     int available(void);
 
 private:
     volatile unsigned char *rx_buf_in;
     volatile unsigned char *rx_buf_out;
-    Stream *_port;
+    TY_UART *_serial_port;
 };
 
 #endif /* __TUYA_UART_H__ */
