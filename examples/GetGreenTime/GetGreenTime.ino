@@ -11,10 +11,11 @@
  * @Github:https://github.com/tuya/tuya-wifi-mcu-sdk-arduino-library
  */
 #include <TuyaWifi.h>
-#include <SoftwareSerial.h>
+
+// STM32
+// HardwareSerial Serial2(PA_3, PA_2);
 
 TuyaWifi my_device;
-SoftwareSerial DebugSerial(8,9);
 
 /* Current LED status */
 unsigned char led_state = 0;
@@ -44,7 +45,7 @@ unsigned long last_time = 0;
 void setup() 
 {
   Serial.begin(9600);
-  DebugSerial.begin(9600);
+  Serial2.begin(9600);
 
   //Initialize led port, turn off led.
   pinMode(LED_BUILTIN, OUTPUT);
@@ -94,19 +95,19 @@ void loop()
   if (millis() - last_get_green_time >= 3000) {
     last_get_green_time = millis();
     if (TY_SUCCESS == my_device.get_green_time(&green_time, 100)) { /* if network lag, you can increase the timeout */
-      DebugSerial.print(green_time.year);
-      DebugSerial.print("-");
-      DebugSerial.print(green_time.month);
-      DebugSerial.print("-");
-      DebugSerial.println(green_time.day);
+      Serial2.print(green_time.year);
+      Serial2.print("-");
+      Serial2.print(green_time.month);
+      Serial2.print("-");
+      Serial2.println(green_time.day);
 
-      DebugSerial.print(green_time.hour);
-      DebugSerial.print(":");
-      DebugSerial.print(green_time.minute);
-      DebugSerial.print(":");
-      DebugSerial.println(green_time.second);
+      Serial2.print(green_time.hour);
+      Serial2.print(":");
+      Serial2.print(green_time.minute);
+      Serial2.print(":");
+      Serial2.println(green_time.second);
     } else {
-      DebugSerial.println("get green time failed");
+      Serial2.println("get green time failed");
     }
   }
 

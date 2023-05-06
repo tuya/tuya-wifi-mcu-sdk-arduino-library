@@ -14,7 +14,6 @@
  */
 
 #include <TuyaWifi.h>
-#include <SoftwareSerial.h>
 
 TuyaWifi my_device;
 

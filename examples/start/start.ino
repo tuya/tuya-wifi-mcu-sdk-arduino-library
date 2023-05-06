@@ -16,10 +16,7 @@
 
 #include <TuyaWifi.h>
 
-// STM32
-// HardwareSerial Serial2(PA_3, PA_2);
-
-TuyaWifi my_device(&Serial2);
+TuyaWifi my_device;
 
 /* Current LED status */
 unsigned char led_state = 0;
@@ -46,7 +43,6 @@ unsigned long last_time = 0;
 void setup() 
 {
   Serial.begin(9600);
-  Serial2.begin(9600);
 
   //Initialize led port, turn off led.
   pinMode(LED_BUILTIN, OUTPUT);
